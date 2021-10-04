@@ -12,22 +12,22 @@
 		$stmt->execute();
 		if($stmt->fetch()){
 			$notice = "Sellise emailiga kasutaja on juba olemas!";
-			return $notice;
+		} else {
+			$stmt->close();
+			$stmt = $conn->prepare("INSERT INTO vprog_users (firstname, lastname, birthdate, gender, email, password) VALUES(?,?,?,?,?,?)");
+			echo $conn->error;
+			//krüpteerime parooli
+			$option = ["cost" => 12];
+			$pwd_hash = password_hash($password, PASSWORD_BCRYPT, $option);
+			
+			$stmt->bind_param("sssiss", $name, $surname, $birth_date, $gender, $email, $pwd_hash);
+			
+			if($stmt->execute()){
+				$notice = "Uus kasutaja edukalt loodud!";
+			} else {
+				$notice = "Uue kasutaja loomisel tekkis viga: " .$stmt->error;
+			}	
 		}
-		
-		$stmt = $conn->prepare("INSERT INTO vprog_users (firstname, lastname, birthdate, gender, email, password) VALUES(?,?,?,?,?,?)");
-        echo $conn->error;
-        //krüpteerime parooli
-        $option = ["cost" => 12];
-        $pwd_hash = password_hash($password, PASSWORD_BCRYPT, $option);
-        
-        $stmt->bind_param("sssiss", $name, $surname, $birth_date, $gender, $email, $pwd_hash);
-        
-        if($stmt->execute()){
-            $notice = "Uus kasutaja edukalt loodud!";
-        } else {
-            $notice = "Uue kasutaja loomisel tekkis viga: " .$stmt->error;
-        }
         
         $stmt->close();
         $conn->close();
@@ -50,7 +50,29 @@
                 $_SESSION["user_id"] = $id_from_db;
                 $_SESSION["first_name"] = $firstname_from_db;
                 $_SESSION["last_name"] = $lastname_from_db;
-                $stmt->close();
+				
+				$stmt->close();
+				
+				$text_color = null;
+				$bg_color = null;
+				
+				$stmt = $conn->prepare("SELECT bgcolor, txtcolor FROM vp_userprofiles WHERE userid = ?");
+				$stmt->bind_param("i", $_SESSION["user_id"]);
+				$stmt->bind_result($bg_color, $text_color);
+				$stmt->execute();
+				
+				if($stmt->fetch()){
+					if(!$bg_color){
+						$bg_color = "#999999";
+					}
+					if(!text_color){
+						$text_color = "AA0000";
+					}
+				}
+				
+                $_SESSION["text_color"] = $text_color;
+				$_SESSION["bg_color"] = $bg_color;
+				$stmt->close();
                 $conn->close();
                 header("Location: home.php");
                 exit();
