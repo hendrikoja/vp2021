@@ -1,6 +1,11 @@
 <?php
 	$author_name = "Hendrik Oja";
 	
+	session_start();
+	if(!isset($_SESSION["user_id"])){
+		header("Location: page3.php");
+	}
+	
 	require_once("../../config.php");
 	require_once("fnc_film.php");
 
