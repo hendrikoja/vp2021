@@ -151,4 +151,41 @@
 		
 		return $success;
 		}
+		
+	function get_name_from_id($person_id){
+		$person_name = null;
+		
+		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_username"], $GLOBALS["server_password"], $GLOBALS["database"]);
+		$conn->set_charset("utf8");
+		
+		$stmt = $conn->prepare("SELECT first_name, last_name FROM person WHERE id=?");
+		$stmt->bind_param("i", $person_id);
+		$stmt->bind_result($first_name, $last_name);
+		$stmt->execute();
+		$stmt->fetch();
+		
+		$person_name = $first_name . "_" . $last_name;
+		return $person_name;
+	}
+	
+	function store_person_img($person_id, $image_name){
+		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_username"], $GLOBALS["server_password"], $GLOBALS["database"]);
+		$conn->set_charset("utf8");
+		
+		$stmt = $conn->prepare("INSERT INTO picture (picture_file_name, person_id) values(?, ?)");
+		$stmt->bind_param("ss", $image_name, $person_id);
+		
+		$success = null;
+		
+		if($stmt->execute()){
+			$success = "Salvestamine õnnestus";
+		} else {
+			$success = "Salvestamine ei õnnestunud";
+		}
+		
+		$stmt->close();
+		$conn->close();
+		
+		return $success;
+	}
 ?>

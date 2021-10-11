@@ -23,6 +23,10 @@
 	$selected_position = null;
 	$selected_role = null;
 	
+	$photo_submit_notice = null;
+	$selected_person_for_photo = null;
+	$photo_dir = "movie_photos/";
+	
 	if(isset($_POST["person_input"])){
 		$selected_person = $_POST["person_input"]; 
 	}
@@ -39,6 +43,31 @@
 	if(isset($_POST["person_in_movie_submit"])){
 		$notice = store_movie_relations($selected_person, $selected_movie, $selected_position, $selected_role);
 	}
+	
+	$file_type = null;
+	$file_name = null;
+	if(isset($_POST["person_photo_submit"])){
+		$image_check = getimagesize($_FILES["photo_input"]["tmp_name"]);
+		if($image_check !== false){
+			
+			if($image_check["mime"] == "image/jpeg"){
+				$file_type = "jpg";
+			}
+			if($image_check["mime"] == "image/png"){
+				$file_type = "png";
+			}
+			if($image_check["mime"] == "image/gif"){
+				$file_type = "gif";
+			}
+			
+			$person_name = get_name_from_id($_POST["person_for_photo_input"]);
+			$time_stamp = microtime(1) * 10000;
+			$file_name = $person_name . "_" . $time_stamp . "." . $file_type;
+			
+			move_uploaded_file($_FILES["photo_input"]["tmp_name"], $photo_dir . $file_name);
+			$photo_submit_notice = store_person_img($_POST["person_for_photo_input"], $file_name);
+		}
+	}
 ?>
 	<h1><?php echo $author_name; ?>, veebiprogrammeerimine</h1>
 	<p>See leht on valminud õppetöö raames ja ei sisalda mingisugust tõsiseltvõetavat sisu!</p>
@@ -47,18 +76,18 @@
 	<h2>Filmi info seostamine</h2>
 	<h3>Film, inimene ja tema roll</h3>
 	<form method="POST">
-		<label for="person__input">Isik:</label>
-		<select name="person_input">
+		<label for="person_input">Isik:</label>
+		<select name="person_input" id="person_input">
 			<option value="" selected disabled>Vali isik</option>
 			<?php echo read_all_person($selected_person); ?>
 		</select>
 		<label for="movie_input">Film:</label>
-		<select name="movie_input">
+		<select name="movie_input" id="movie_input">
 			<option value="" selected disabled>Vali film</option>
 			<?php echo read_all_movie($selected_movie); ?>
 		</select>
 		<label for="position__input">Amet:</label>
-		<select name="position_input">
+		<select name="position_input" id="position_input">
 			<option value="" selected disabled>Vali amet</option>
 			<?php echo read_all_position($selected_position); ?>
 		</select>
@@ -67,6 +96,19 @@
 		<input type="submit" name="person_in_movie_submit" value="Salvesta">
 	</form>
 	<span><?php echo $notice; ?></span>
+	<hr>
+	<h3>Filmi tegelase foto</h3>
+	<form method="POST" enctype="multipart/form-data">
+		<label for="person_for_photo_input">Isik:</label>
+		<select name="person_for_photo_input", id="person_for_photo_input">
+			<option value="" selected disabled>Vali isik</option>
+			<?php echo read_all_person($selected_person_for_photo); ?>
+		</select>
+		<label for="photo_input">Vali pildifail:</label>
+		<input type="file" name="photo_input" id="photo_input"></input>
+		<input type="submit" name="person_photo_submit" value="Lae pilt üles">
+	</form>
+	<span><?php echo $photo_submit_notice ?></span>
 	<hr>
 	<ul>
 		<li><a href="?logout=1">Logi välja</a></li>
