@@ -19,6 +19,7 @@
     <ul>
         <li><a href="?logout=1">Logi välja</a></li>
 		<li><a href="user_profile.php">Kasutaja profiil</a></li>
+		<li><a href="movie_relations.php">Filmi info sidumine</a></li>
     </ul>
     
 </body>

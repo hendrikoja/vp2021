@@ -70,7 +70,7 @@
 	<form method="POST">
 		<label for="description_input">Minu lühikirjeldus</label>
 		<br>
-		<textarea name="description_input" id="description_input" rows="10" cols="80" placeholder="Minu lühikirjeldus.."><?php echo $description; ?> </textarea>
+		<textarea name="description_input" id="description_input" rows="10" cols="80" placeholder="Minu lühikirjeldus.."><?php echo $description; ?></textarea>
 		<br>
 		<label for="bg_color_input">Taustavärv</label>
 		<input type="color" name="bg_color_input" id="bg_color_input" value="<?php echo $bg_color; ?>">
