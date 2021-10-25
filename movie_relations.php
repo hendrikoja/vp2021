@@ -22,6 +22,10 @@
 	$selected_movie = null;
 	$selected_position = null;
 	$selected_role = null;
+	$selected_genre = null;
+	$selected_movie_input_for_genre = null;
+	
+	$genre_notice = null;
 	
 	$photo_submit_notice = null;
 	$selected_person_for_photo = null;
@@ -39,9 +43,18 @@
 	if(isset($_POST["role_input"])){
 		$selected_role = $_POST["role_input"];
 	}
+	if(isset($_POST["genre_input"])){
+		$selected_genre = $_POST["genre_input"];
+	}
+	if(isset($_POST["movie_input_for_genre"])){
+		$selected_movie_input_for_genre = $_POST["movie_input_for_genre"];
+	}
 	
 	if(isset($_POST["person_in_movie_submit"])){
 		$notice = store_movie_relations($selected_person, $selected_movie, $selected_position, $selected_role);
+	}
+	if(isset($_POST["movie_genre_submit"])){
+		$genre_notice = store_movie_genre($selected_movie_input_for_genre, $selected_genre);
 	}
 	
 	$file_type = null;
@@ -109,6 +122,22 @@
 		<input type="submit" name="person_photo_submit" value="Lae pilt üles">
 	</form>
 	<span><?php echo $photo_submit_notice ?></span>
+	<hr>
+	<h3>Filmi žanr</h3>
+	<form method="POST">
+		<label for="movie_input_for_genre">Film:</label>
+		<select name="movie_input_for_genre" id="movie_input_for_genre">
+			<option value="" selected disabled>Vali film</option>
+			<?php echo read_all_movie($selected_movie_input_for_genre); ?>
+		</select>
+		<label for="genre_input">Žanr:</label>
+		<select name="genre_input" id="genre_input">
+			<option value="" selected disabled>Vali žanr</option>
+			<?php echo read_all_genre($selected_genre); ?>
+		</select>
+		<input type="submit" name="movie_genre_submit" value="Salvesta">
+		<span><?php echo $genre_notice; ?></span>
+	</form>
 	<hr>
 	<ul>
 		<li><a href="?logout=1">Logi välja</a></li>

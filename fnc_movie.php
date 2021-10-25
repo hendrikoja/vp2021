@@ -54,7 +54,34 @@
 		
 		return $html;
 	}
-	
+
+	function read_all_genre($selected){
+		$html = null;
+		
+		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_username"], $GLOBALS["server_password"], $GLOBALS["database"]);
+		$conn->set_charset("utf8");
+		
+		$stmt = $conn->prepare("SELECT id, genre_name FROM genre");
+		$stmt->bind_result($id_from_db, $genre_from_db);
+		$stmt->execute();
+		
+		while($stmt->fetch()){
+			$html .='<option value="'. $id_from_db .'"';
+			
+			if($selected == $id_from_db){
+				$html .= " selected";
+			}
+			
+			$html .= ">" . $genre_from_db . "</option>";
+			$html .= "\n";
+		}
+		
+		$stmt->close();
+		$conn->close();
+		
+		return $html;
+	}
+
 	function read_all_position($selected){
 		$html = null;
 		
@@ -98,6 +125,56 @@
 		}
 		
 		$stmt->close();
+		
+		$stmt = $conn->prepare("INSERT INTO person_in_movie (person_id, movie_id, position_id, role) values(?, ?, ?, ?)");
+		$stmt->bind_param("iiis", $person, $movie, $position, $role);
+		
+		$success = null;
+		
+		if($stmt->execute()){
+			$success = "Salvestamine õnnestus";
+		} else {
+			$success = "Salvestamine ei õnnestunud";
+		}
+		
+		$stmt->close();
+		$conn->close();
+		
+		return $success;
+	}
+
+	function store_movie_genre($movie, $genre){
+		#pooleli
+		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_username"], $GLOBALS["server_password"], $GLOBALS["database"]);
+		$conn->set_charset("utf8");
+		
+		$stmt = $conn->prepare("SELECT * FROM movie_genre WHERE genre_id= ? AND movie_id= ?");
+		$stmt->bind_param("ii", $genre, $movie);
+		$stmt->execute();
+		
+		if($stmt->fetch()){
+			$stmt->close();
+			$conn->close();
+			return "Selline seos on juba olemas!";
+		}
+		
+		$stmt->close();
+		
+		$stmt = $conn->prepare("INSERT INTO movie_genre (movie_id, genre_id) values(?, ?)");
+		$stmt->bind_param("ii", $movie, $genre);
+		
+		$success = null;
+		
+		if($stmt->execute()){
+			$success = "Salvestamine õnnestus";
+		} else {
+			$success = "Salvestamine ei õnnestunud";
+		}
+		
+		$stmt->close();
+		$conn->close();
+		
+		return $success;
 		
 		
 		
@@ -188,4 +265,7 @@
 		
 		return $success;
 	}
+	
+	
+	
 ?>

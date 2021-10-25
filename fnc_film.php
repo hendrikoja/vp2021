@@ -1,6 +1,8 @@
 <?php
 	$database = "if21_hen_oja";
 	
+	require_once("fnc_general.php");
+	
 	function read_all_films(){
 		
 		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_username"], $GLOBALS["server_password"], $GLOBALS["database"]);
@@ -16,7 +18,7 @@
 			$films_html .= "<h3>" . $title_from_db . "</h3> \n";
 			$films_html .= "<ul> \n";
 			$films_html .= "<li>Valmimisaasta: " . $year_from_db . "</li> \n";
-			$films_html .= "<li>Kestus: " . $duration_from_db . "</li> \n";
+			$films_html .= "<li>Kestus: " . minutes_to_hour($duration_from_db) . "</li> \n";
 			$films_html .= "<li>Žanr: " . $genre_from_db . "</li> \n";
 			$films_html .= "<li>Tootja: " . $studio_from_db . "</li> \n";
 			$films_html .= "<li>Lavastaja: " . $director_from_db . "</li> \n";
